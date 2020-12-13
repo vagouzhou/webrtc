@@ -21,6 +21,11 @@ extern const uint16_t kDefaultServerPort;  // From defaults.[h|cc]
 // header file so that they can be shared across the different main.cc's
 // for each platform.
 
+ABSL_FLAG(std::string,
+          rtc_logfile,
+          "",
+          "set webrtc log file path");
+
 ABSL_FLAG(bool,
           autoconnect,
           false,
