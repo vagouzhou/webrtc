@@ -62,13 +62,17 @@ WindowsCommandLineArguments::WindowsCommandLineArguments() {
   // iterate over the returned wide strings;
   for (int i = 0; i < argc; ++i) {
     args_.push_back(rtc::ToUtf8(wide_argv[i], wcslen(wide_argv[i])));
-    // make sure the argv array points to the string data.
-    argv_.push_back(const_cast<char*>(args_.back().c_str()));
   }
+
+  // make sure the argv array points to the string data.
+  std::for_each(args_.begin(), args_.end(), [this](std::string& item) {
+    argv_.push_back(const_cast<char*>(item.c_str()));
+   });
   LocalFree(wide_argv);
 }
 
 }  // namespace
+
 int PASCAL wWinMain(HINSTANCE instance,
                     HINSTANCE prev_instance,
                     wchar_t* cmd_line,
