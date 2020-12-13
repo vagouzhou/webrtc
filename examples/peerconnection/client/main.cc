@@ -73,6 +73,7 @@ WindowsCommandLineArguments::WindowsCommandLineArguments() {
 
 }  // namespace
 
+#include "rtc_base/event_tracer.h"
 int PASCAL wWinMain(HINSTANCE instance,
                     HINSTANCE prev_instance,
                     wchar_t* cmd_line,
@@ -99,7 +100,12 @@ int PASCAL wWinMain(HINSTANCE instance,
     printf("Error: %i is not a valid port.\n", absl::GetFlag(FLAGS_port));
     return -1;
   }
-
+  const std::string rtc_logfile = absl::GetFlag(FLAGS_rtc_logfile);
+  bool enable_log = (rtc_logfile.length() > 0);
+  if (enable_log) {
+    rtc::tracing::SetupInternalTracer();
+    rtc::tracing::StartInternalCapture(rtc_logfile.c_str());
+  }
   const std::string server = absl::GetFlag(FLAGS_server);
   MainWnd wnd(server.c_str(), absl::GetFlag(FLAGS_port),
               absl::GetFlag(FLAGS_autoconnect), absl::GetFlag(FLAGS_autocall));
@@ -133,5 +139,8 @@ int PASCAL wWinMain(HINSTANCE instance,
   }
 
   rtc::CleanupSSL();
+  if (enable_log) {
+    rtc::tracing::ShutdownInternalTracer();
+  }
   return 0;
 }
